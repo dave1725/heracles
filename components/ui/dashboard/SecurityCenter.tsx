@@ -5,9 +5,14 @@ import { AlertCircle, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 
+type item = {
+  label: string,
+  Description: string,
+  Enabled: boolean,
+}
 
 export function SecurityCenter() {
-  const [items, setItems] = useState<any>(null);
+  const [items, setItems] = useState<item[] | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -17,8 +22,10 @@ export function SecurityCenter() {
           setItems(res.data);
         })
 
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
+      } catch (err: unknown) {
+        let msg = "something happened";
+        if(err instanceof Error) msg = err.message;
+        setError(msg || "Unknown error");
       }
     };
 
@@ -42,7 +49,7 @@ export function SecurityCenter() {
             <p className="text-muted-foreground text-sm">Checking security status...</p>
           )}
 
-          {items?.map((item:any,index:any) => (
+          {items?.map((item:item,index:number) => (
             <div
               key={index}
               className="flex items-center justify-between border-b pb-2 last:border-0"

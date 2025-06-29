@@ -1,30 +1,33 @@
-# networkInfo.ps1 (safe version)
+$adapters = Get-NetAdapter | Where-Object { $_.Status -ne "Not Present" } | ForEach-Object {
+    $ip = Get-NetIPAddress -InterfaceAlias $_.Name -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1
+    $ipv6 = Get-NetIPAddress -InterfaceAlias $_.Name -AddressFamily IPv6 -ErrorAction SilentlyContinue | Select-Object -First 1
+    $dns = (Get-DnsClientServerAddress -InterfaceAlias $_.Name -ErrorAction SilentlyContinue).ServerAddresses
 
-try {
-    $adapters = Get-CimInstance Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true }
-
-    if (-not $adapters) {
-        Write-Error "No active network adapters found."
-        exit 1
-    }
-
-    $output = @()
-
-    foreach ($adapter in $adapters) {
-        $info = @{
-            description     = $adapter.Description
-            macAddress      = $adapter.MACAddress
-            ipAddress       = if ($adapter.IPAddress) { $adapter.IPAddress[0] } else { "" }
-            subnetMask      = if ($adapter.IPSubnet) { $adapter.IPSubnet[0] } else { "" }
-            defaultGateway  = if ($adapter.DefaultIPGateway) { $adapter.DefaultIPGateway[0] } else { "" }
+    $speedRaw = $_.LinkSpeed
+    $speedMbps = if ($speedRaw) {
+        # Extract numeric part and convert Gbps/Mbps to Mbps
+        if ($speedRaw -match '([\d\.]+)\s*Gbps') {
+            [int]([double]$matches[1] * 1000)
+        } elseif ($speedRaw -match '([\d\.]+)\s*Mbps') {
+            [int][double]$matches[1]
+        } else {
+            $null  # Unknown format
         }
-
-        $output += $info
     }
 
-    $output | ConvertTo-Json -Compress
+    [PSCustomObject]@{
+        id     = $_.InterfaceIndex
+        name   = $_.Name
+        status = if ($_.Status -eq "Up") { "connected" } else { "disconnected" }
+        ipv4   = $ip.IPAddress
+        ipv6   = $ipv6.IPAddress
+        dns    = $dns
+        type   = if ($_.InterfaceDescription -match "Wi-Fi|Wireless") { "wifi" } else { "ethernet" }
+        ssid   = if ($_.InterfaceDescription -match "Wi-Fi|Wireless") {
+                    (netsh wlan show interfaces | Select-String '^\s*SSID\s*:\s*(.+)$').Matches.Groups[1].Value.Trim()
+                 } else { $null }
+        speedMbps = $speedMbps
+    }
 }
-catch {
-    Write-Error "Error fetching network info: $_"
-    exit 1
-}
+
+$adapters | ConvertTo-Json -Depth 3

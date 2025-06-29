@@ -18,9 +18,14 @@ export async function POST(req: Request) {
 
     const json = JSON.parse(stdout);
     return NextResponse.json(json);
-  } catch (error: any) {
+    
+  } catch (error: unknown) {
+    let message = "Unexpected error occurred";
+    if(error instanceof Error){
+      message = error.message;
+    }
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message },
       { status: 500 }
     );
   }

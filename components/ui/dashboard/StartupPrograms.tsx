@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Switch } from "@/components/ui/switch";
 import {
   Card,
   CardHeader,
@@ -10,16 +9,26 @@ import {
 } from "@/components/ui/card";
 import axios from "axios";
 
+type program = {
+  Name: string;
+  Path: string;
+  Source: string;
+  Location: string;
+  Enabled: boolean;
+  Publisher?: string;
+};
+
+
 export function StartupPrograms() {
-  const [programs, setPrograms] = useState<any>([]);
+const [programs, setPrograms] = useState<program[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const isEnabled = (app: any): boolean => {
-    if (app.source.includes("Startup Folder")) {
-      return !app.path.endsWith(".disabled");
-    }
-    return true; // Registry items assumed enabled if present
-  };
+  // const isEnabled = (app: any): boolean => {
+  //   if (app.source.includes("Startup Folder")) {
+  //     return !app.path.endsWith(".disabled");
+  //   }
+  //   return true; // Registry items assumed enabled if present
+  // };
 
   const fetchStartupPrograms = async () => {
   try {
@@ -29,47 +38,57 @@ export function StartupPrograms() {
     console.log("Startup Programs:", res.data);
     setPrograms(res.data);
 
-  } catch (err: any) {
+  } catch (err: unknown) {
+    if (
+    typeof err === "object" &&
+    err !== null &&
+    "response" in err
+  ) {
+    const axiosErr = err as { response: { status: number; }; message: string };
+    
     console.error("Axios Error:", {
-      status: err?.response?.status,
-      data: err?.response?.data,
-      message: err?.message,
+      status: axiosErr.response.status,
+      message: axiosErr.message,
     });
+  } else {
+    console.error("Unknown error type:", err);
+  }
 
-    alert("Could not load startup programs.\n" + (err?.response?.data?.error || err.message));
+    alert("Could not load startup programs.\n");
   } finally {
     setLoading(false);
   }
 };
 
 
-  const handleToggle = async (app: any, newState: boolean) => {
-    try {
-      console.log(newState);
-      const res = await axios.post("http://localhost:3000/api/stats/system/startup/disable", {
-        name: app.Name,
-        path: app.Path,
-        source: app.Source,
-        location: app.Location,
-        enable: newState,
-      });
+//   const handleToggle = async (app: program, newState: boolean) => {
+//     try {
+//       console.log(newState);
+//       const res = await axios.post("http://localhost:3000/api/stats/system/startup/disable", {
+//         name: app.Name,
+//         path: app.Path,
+//         source: app.Source,
+//         location: app.Location,
+//         enable: newState,
+//       });
 
-      if (res.data.success) {
-        setPrograms((prev:any) =>
-          prev.map((p:any) =>
-            p.Name === app.Name && p.Location === app.Location
-              ? { ...p, enabled: newState }
-              : p
-          )
-        );
-      } else {
-        alert("Failed to toggle item: " + res.data.error);
-      }
-    } catch (err) {
-      console.error("Toggle failed", err);
-      alert("An error occurred while toggling the startup program.");
-    }
-  };
+//       if (res.data.success) {
+//         setPrograms((prev: program[]) =>
+//   prev.map((p: program) =>
+//     p.Name === app.Name && p.Location === app.Location
+//       ? { ...p, Enabled: newState }
+//       : p
+//   )
+// );
+
+//       } else {
+//         alert("Failed to toggle item: " + res.data.error);
+//       }
+//     } catch (err) {
+//       console.error("Toggle failed", err);
+//       alert("An error occurred while toggling the startup program.");
+//     }
+//   };
 
   useEffect(() => {
     fetchStartupPrograms();
@@ -96,7 +115,7 @@ export function StartupPrograms() {
       No startup programs found.
     </p>
   ) : (
-    programs.map((app: any, index: number) => (
+    programs.map((app: program, index: number) => (
       <div
         key={index}
         className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 border rounded-2xl bg-muted/20 hover:bg-muted/30 transition-all"

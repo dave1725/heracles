@@ -5,9 +5,10 @@ import {
   Monitor,
   CheckCircle2,
   XCircle,
-  Cpu,
-  WifiOff,
+  // Cpu,
+  // WifiOff,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type NetworkAdapter = {
@@ -61,6 +62,25 @@ function getStatusIcon(status: NetworkAdapter["status"]) {
 }
 
 export function NetworkInfo() {
+  const [adapters, setAdapters] = useState<NetworkAdapter[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNetworkInfo = async () => {
+      try {
+        const res = await fetch("/api/stats/system/network");
+        const data = await res.json();
+        setAdapters(data);
+      } catch (error) {
+        console.error("Failed to fetch network data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNetworkInfo();
+  }, []);
+
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">Network Information</h2>
@@ -69,7 +89,7 @@ export function NetworkInfo() {
           <CardTitle className="text-base">Adapters & Status</CardTitle>
         </CardHeader>
         <CardContent className="divide-y">
-          {mockAdapters.map(
+          {adapters.map(
             ({ id, name, status, ipv4, ipv6, dns, speedMbps, type, ssid }) => (
               <div key={id} className="py-4 flex flex-col md:flex-row md:justify-between">
                 <div className="flex items-center gap-2 mb-2 md:mb-0">

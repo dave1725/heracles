@@ -1,27 +1,29 @@
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
-import path from "path";
+import { promisify } from "util";
+const execAsync = promisify(exec);
 
 export async function GET() {
-  return new Promise((resolve) => {
-    exec('systeminfo', (error, stdout, stderr) => {
-      if (error) {
-        resolve(NextResponse.json({ error: error.message }, { status: 500 }));
-        return;
-      }
+  try {
+    const {stderr, stdout} = await execAsync('systeminfo');
+
       if (stderr) {
-        resolve(NextResponse.json({ error: stderr }, { status: 500 }));
-        return;
+        return NextResponse.json({ error: stderr }, { status: 500 });
       }
 
       const info = parseSystemInfo(stdout);
-      resolve(NextResponse.json(info));
-    });
-  });
+      return NextResponse.json(info);
+  }
+  catch (error:unknown){
+    return NextResponse.json(
+      { message: `failed to retrieve info: ${String(error)}`},
+      { status: 500}
+    );
+  }
 }
 
 function parseSystemInfo(stdout: string) {
-  const systemInfo: any = {};
+  const systemInfo: Record<string, unknown> = {};
   
   const lines = stdout.split('\n');
   lines.forEach(line => {

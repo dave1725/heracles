@@ -12,12 +12,17 @@ export async function GET() {
 
     const data = JSON.parse(stdout);
     return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Failed to retrieve thermal data:', error);
+
+  } catch (error: unknown) {
+    let msg = "Unexpected error occurred";
+    if(error instanceof Error){
+      msg = error.message;
+    }
+    console.error('Failed to retrieve thermal data:', msg);
     return NextResponse.json(
       {
         error: 'Failed to retrieve thermal data',
-        details: error.message || 'Unknown error',
+        details: msg || 'Unknown error',
       },
       { status: 500 }
     );

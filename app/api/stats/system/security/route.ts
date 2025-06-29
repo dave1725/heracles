@@ -17,10 +17,15 @@ export async function GET() {
 
     const result = JSON.parse(stdout);
     return NextResponse.json(result);
-  } catch (error: any) {
+
+  } catch (error: unknown) {
+    let message = "Unexpected error at sec center";
     console.error("Security Center API Error:", error);
+    if(error instanceof Error){
+      message = error.message;
+    }
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: message },
       { status: 500 }
     );
   }

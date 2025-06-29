@@ -16,8 +16,12 @@ export async function GET() {
 
     const data = JSON.parse(stdout);
     return NextResponse.json(data);
-  } catch (error: any) {
-    console.error("Error fetching Windows updates:", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    let message = "Unexpected error occurred";
+    if(error instanceof Error){
+      message = error.message;
+    }
+    console.error("Error fetching Windows updates:", message);
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

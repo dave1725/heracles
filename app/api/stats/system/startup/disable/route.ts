@@ -32,10 +32,14 @@ export async function POST(req: Request) {
     const parsed = JSON.parse(stdout);
     return NextResponse.json(parsed);
 
-  } catch (error: any) {
-    console.error("Toggle API Error:", error);
+  } catch (error: unknown) {
+    let message = "Unexpected error occurred";
+    if(error instanceof Error){
+      message = error.message;
+    }
+    console.error("Toggle API Error:", message);
     return NextResponse.json(
-      { success: false, error: error.message || "Unknown error" },
+      { success: false, error: message || "Unknown error" },
       { status: 500 }
     );
   }

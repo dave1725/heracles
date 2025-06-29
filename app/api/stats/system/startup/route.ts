@@ -20,8 +20,13 @@ export async function GET() {
 
     const parsed = JSON.parse(stdout);
     return NextResponse.json(parsed);
-  } catch (error: any) {
-    console.error("Error reading startup programs:", error.message);
+
+  } catch (error: unknown) {
+    let message = "Unexpected error occurred";
+    if(error instanceof Error){
+      message = error.message;
+    }
+    console.error("Error reading startup programs:", message);
     return NextResponse.json(
       { error: "Failed to retrieve startup programs." },
       { status: 500 }

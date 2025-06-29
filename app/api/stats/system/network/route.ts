@@ -1,35 +1,23 @@
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import path from "path";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 export async function GET() {
-  return new Promise((resolve) => {
-    const scriptPath = path.resolve(process.cwd(), "scripts", "networkInfo.ps1");
+  const scriptPath = path.resolve(process.cwd(), "scripts", "networkInfo.ps1");
 
-    exec(
-      `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`,
-      (error, stdout, stderr) => {
-        if (error) {
-          resolve(NextResponse.json({ error: error.message }, { status: 500 }));
-          return;
-        }
-        if (stderr) {
-          resolve(NextResponse.json({ error: stderr }, { status: 500 }));
-          return;
-        }
-
-        try {
-          const data = JSON.parse(stdout);
-          resolve(NextResponse.json(data));
-        } catch (err) {
-          resolve(
-            NextResponse.json(
-              { error: "Failed to parse JSON from PowerShell output" },
-              { status: 500 }
-            )
-          );
-        }
-      }
+  try {
+    const { stdout } = await execAsync(
+      `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`
     );
-  });
+    const data = JSON.parse(stdout);
+    return NextResponse.json(data);
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Failed to fetch network info", details: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
 }

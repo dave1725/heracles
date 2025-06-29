@@ -6,41 +6,39 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 type Disk = {
-  name: string;
-  fileSystem: string;
-  total: string;
-  used: string;
-  usagePercent: number;
-  health: string;
+  volumeName: string;
+  deviceID: number,
+  totalGB: number,
+  usedGB: number,
+  usedPercent: number;
   smartWarning?: boolean;
 };
 
 
 
-const mockDisks: Disk[] = [
-  {
-    name: "C:",
-    fileSystem: "NTFS",
-    total: "512 GB",
-    used: "490 GB",
-    usagePercent: 95.7,
-    health: "Healthy",
-    smartWarning: true,
-  },
-  {
-    name: "D:",
-    fileSystem: "NTFS",
-    total: "1 TB",
-    used: "120 GB",
-    usagePercent: 12,
-    health: "Healthy",
-  },
-];
+// const mockDisks: Disk[] = [
+//   {
+//     name: "C:",
+//     fileSystem: "NTFS",
+//     total: "512 GB",
+//     used: "490 GB",
+//     usagePercent: 95.7,
+//     health: "Healthy",
+//     smartWarning: true,
+//   },
+//   {
+//     name: "D:",
+//     fileSystem: "NTFS",
+//     total: "1 TB",
+//     used: "120 GB",
+//     usagePercent: 12,
+//     health: "Healthy",
+//   },
+// ];
 
 export function DisksOverview() {
-  const [disks,setDisks] = useState<any>([]);
+  const [disks,setDisks] = useState<Disk[]>([]);
 
-  
   const fetchStats = () => {
   axios.get("http://localhost:3000/api/stats/system/disk").then((res)=>{
     setDisks(res.data);
@@ -68,12 +66,12 @@ useEffect(() => {
     <div>
       <h2 className="text-lg font-semibold mb-4">Disks Overview</h2>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        {disks.map((disk:any) => (
+        {disks.map((disk:Disk) => (
           <Card key={disk.volumeName}>
             <CardHeader className="flex items-center justify-between">
               <CardTitle className="text-sm flex items-center gap-2">
                 <HardDriveIcon className="w-4 h-4" />
-                {disk.volumeName}({disk.deviceID}) — {disk.fileSystem}
+                {disk.volumeName}({disk.deviceID}) —
               </CardTitle>
               {disk.smartWarning && (
                 <AlertCircle className="w-5 h-5 text-red-600" aria-label="SMART warning detected" />
