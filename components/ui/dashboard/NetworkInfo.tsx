@@ -80,6 +80,13 @@ export function NetworkInfo() {
 
     fetchNetworkInfo();
   }, []);
+  
+
+  if (
+    !adapters
+  ) {
+    return <div className="text-muted-foreground text-sm">Gathering network details...</div>;
+  }
 
   return (
     <div>

@@ -19,95 +19,73 @@ import {
   ShieldCheck,
   ThermometerSun,
 } from "lucide-react";
-
 import axios from "axios";
-
-// Helpers (not modified)
-function parsePercentage(str: string): number {
-  return parseFloat(str.replace("%", ""));
-}
 
 export function StatsCards() {
   const [cpuInfo, setCpuInfo] = useState<any>(null);
-  const [ processorCount, setProcessorCount ] = useState<any>(null);
   const [memoryInfo, setMemoryInfo] = useState<any>(null);
-  const [diskInfo, setDiskInfo] = useState<any>(null);
-  const [uptimeMin, setUptimeMin] = useState<any>(null);
-  const [uptimeHrs, setUptimeHrs] = useState<any>(null);
-  const [ threadCount, setThreadCount ] = useState<any>(null);
-  const [ name, setName ] = useState<any>(null);
-  const [ currentSpeed, setCurrentSpeed ] = useState<any>();
-  const [ maxSpeed, setMaxSpeed ] = useState<any>();
-  const [ virtualization, setVirtualization ] = useState<any>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [ thermalData, setThermalData ] = useState<any>();
+  const [diskUsage, setDiskUsage] = useState<any>(null);
+  const [uptime, setUptime] = useState<string | null>(null);
+  const [thermalData, setThermalData] = useState<any>(null);
+  const [cpuDetails, setCpuDetails] = useState<any>(null);
+  const [error, setError] = useState<boolean>(false);
 
-  // Function to fetch stats
   const fetchStats = async () => {
-    setIsLoading(true);
-
     try {
-      const [cpuRes, memoryRes, diskRes, uptimeRes, thermalRes] = await Promise.all([
-        axios.get("http://localhost:3000/api/stats/system/cpu"),
-        axios.get("http://localhost:3000/api/stats/system/memory"),
-        axios.get("http://localhost:3000/api/stats/system/disk"),
-        axios.get("http://localhost:3000/api/stats/system/uptime"),
-        axios.get("http://localhost:3000/api/stats/system/thermal")
+      const [cpuRes, memoryRes] = await Promise.all([
+        axios.get("/api/stats/system/cpu"),
+        axios.get("/api/stats/system/memory"),
       ]);
 
       setCpuInfo(cpuRes.data.cpuLoadPercentage);
-      setProcessorCount(cpuRes.data.logicalProcessorCount);
-      setThreadCount(cpuRes.data.threadCount);
-      setName(cpuRes.data.name);
-      setCurrentSpeed(cpuRes.data.currentSpeedMHz);
-      setMaxSpeed(cpuRes.data.maxSpeedMHz);
-      setVirtualization(cpuRes.data.virtualizationEnabled);
+      setCpuDetails(cpuRes.data);
       setMemoryInfo(memoryRes.data.MemoryUsagePercentage);
-      console.log(thermalRes);
-      setThermalData(thermalRes.data);
 
-      const diskData = diskRes.data;
-      setDiskInfo(diskData);
+      // Fetch other data non-blocking
+      axios.get("/api/stats/system/disk").then((res) => {
+        const diskData = res.data;
+        const { totalSize, usedSize } = diskData.reduce(
+          (acc: any, item: any) => {
+            acc.totalSize += item.totalGB || 0;
+            acc.usedSize += item.usedGB || 0;
+            return acc;
+          },
+          { totalSize: 0, usedSize: 0 }
+        );
+        const percentage = totalSize > 0 ? ((usedSize / totalSize) * 100).toFixed(2) : "0";
+        setDiskUsage(percentage);
+      });
 
-      const { totalSize, usedSize } = diskData.reduce(
-        (acc: any, item: any) => {
-          acc.totalSize += parseFloat(item.totalGB) || 0;
-          acc.usedSize += parseFloat(item.usedGB) || 0;
-          return acc;
-        },
-        { totalSize: 0, usedSize: 0 }
-      );
+      axios.get("/api/stats/system/uptime").then((res) => {
+        setUptime(`Since ${res.data.uptimeHours}H:${res.data.uptimeMinutes}m`);
+      });
 
-      if (totalSize > 0) {
-        const percentage = ((usedSize / totalSize) * 100).toFixed(2);
-        setDiskInfo(percentage);
-      }
-
-      setUptimeHrs(uptimeRes.data.uptimeHours);
-      setUptimeMin(uptimeRes.data.uptimeMinutes);
+      axios.get("/api/stats/system/thermal").then((res) => {
+        setThermalData(res.data);
+      });
     } catch (err) {
-      console.error("Error fetching stats:", err);
-    } finally {
-      setIsLoading(false);
+      console.error("Error fetching core stats:", err);
+      setError(true);
     }
   };
 
-  // Polling stats every 5 seconds
   useEffect(() => {
-    fetchStats(); // Fetch stats initially
-
-    const intervalId = setInterval(() => {
-      fetchStats(); // Fetch stats periodically
-    }, 10000); // 5000 ms = 5 seconds
-
-    // Cleanup interval on component unmount
-    return () => {
-      clearInterval(intervalId);
-    };
+    fetchStats();
+    const intervalId = setInterval(fetchStats, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
-  if (!cpuInfo || !memoryInfo || !diskInfo || !uptimeHrs) {
-    return <div>Loading...</div>;
+  if (error) return <div className="text-destructive">Failed to load system stats.</div>;
+
+  if (
+    cpuInfo === null ||
+    memoryInfo === null ||
+    diskUsage === null ||
+    uptime === null ||
+    !thermalData ||
+    !cpuDetails
+  ) {
+    return <div className="text-muted-foreground text-sm">Gathering stats...</div>;
   }
 
   const stats = [
@@ -115,32 +93,32 @@ export function StatsCards() {
       label: "CPU Usage",
       value: `${cpuInfo}%`,
       icon: <Gauge className="w-5 h-5 text-primary" />,
-      warning: cpuInfo.cpuLoadPercentage >= 85,
+      warning: cpuInfo >= 85,
       warningMessage: "High CPU usage",
     },
     {
       label: "Current Speed",
-      value: `${currentSpeed} MHz`,
+      value: `${cpuDetails.currentSpeedMHz} MHz`,
       icon: <Activity className="w-5 h-5 text-primary" />,
     },
     {
       label: "Max Speed",
-      value: `${maxSpeed} MHz`,
+      value: `${cpuDetails.maxSpeedMHz} MHz`,
       icon: <Settings className="w-5 h-5 text-primary" />,
     },
     {
       label: "Virtualization(Firmware)",
-      value: virtualization ? "Enabled" : "Disabled",
+      value: cpuDetails.virtualizationEnabled ? "Enabled" : "Disabled",
       icon: <ShieldCheck className="w-5 h-5 text-primary" />,
     },
     {
       label: "Threads",
-      value: `${threadCount}`,
+      value: `${cpuDetails.threadCount}`,
       icon: <Cpu className="w-5 h-5 text-primary" />,
     },
     {
       label: "Logical Processors",
-      value: `${processorCount}`,
+      value: `${cpuDetails.logicalProcessorCount}`,
       icon: <Cpu className="w-5 h-5 text-primary" />,
     },
     {
@@ -152,27 +130,26 @@ export function StatsCards() {
     },
     {
       label: "Disk Usage",
-      value: `${diskInfo}%`,
+      value: `${diskUsage}%`,
       icon: <HardDrive className="w-5 h-5 text-primary" />,
-      warning: diskInfo >= 90,
+      warning: diskUsage >= 90,
       warningMessage: "Low disk space",
     },
     {
       label: "System Uptime",
-      value: `Since ${uptimeHrs}H:${uptimeMin}m`,
+      value: uptime,
       icon: <Timer className="w-5 h-5 text-primary" />,
-      warning: uptimeHrs >= 12,
+      warning: parseInt(uptime) >= 12,
       warningMessage: "Please restart soon",
     },
     {
       label: "Temperature",
       value: `${thermalData.TemperatureCelsius} C`,
       icon: <ThermometerSun className="w-5 h-5 text-primary" />,
-      warning: thermalData >= 80,
+      warning: thermalData.TemperatureCelsius >= 80,
       warningMessage: "Please shutdown your system",
     },
   ];
-
 
   return (
     <div>
