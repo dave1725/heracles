@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { format } from "date-fns";
 import { RocketIcon, Trash2, RefreshCcw, Search } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,49 +13,54 @@ export function QuickActions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleRun = async (script: string) => {
-    const actionNames: Record<string, string> = {
-      cleanTemp: "Cleaning Temp Files",
-      flushDNS: "Flushing DNS Cache",
-      systemScan: "Running System Scan",
-      restartExplorer: "Restarting Explorer",
-    };
+  const actionNames: Record<string, string> = {
+    cleanTemp: "Cleaning Temp Files",
+    flushDNS: "Flushing DNS Cache",
+    systemScan: "Running System Scan",
+    restartExplorer: "Restarting Explorer",
+  };
 
-    const actionLabel = actionNames[script] || "Running Action";
-    const toastId = toast.loading(`${actionLabel}...`);
+  const actionLabel = actionNames[script] || "Running Action";
+  const toastId = toast.loading(`${actionLabel}...`);
 
-    try {
-      setLoading(script);
+  try {
+    setLoading(script);
 
-      const res = await fetch("/api/stats/system/quick-action", {
-        method: "POST",
-        body: JSON.stringify({ action: script }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const res = await fetch("/api/stats/system/quick-action", {
+      method: "POST",
+      body: JSON.stringify({ action: script }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+
+    if (data.success && script === "systemScan") {
+      const match = data.lastScanTime?.match(/\d+/);
+      const timestamp = match ? Number(match[0]) : Date.now();
+      const convertedDate = new Date(timestamp);
+      console.log(data.success);
+
+      setScanResult({
+        message: data.message,
+        status: data.success ? "Scan Successfull": "Something Failed",
+        threatsFound: data.malwareDetected || "No threats found",
+        lastScanTime: convertedDate,
       });
 
-      const data = await res.json();
-
-      if (data.success && script === "systemScan") {
-        setScanResult({
-          message: data.message,
-          threatsFound: data.threatsFound ?? "N/A",
-          lastScanTime: data.lastScanTime
-            ? new Date(parseInt(data.lastScanTime.replace(/[^\d]/g, ""), 10)).toLocaleString()
-            : "Unknown",
-        });
-        setIsModalOpen(true);
-        toast.success("System scan completed.", { id: toastId, duration: 3000 });
-      } else {
-        toast.success(data.message || `${actionLabel} completed.`, { id: toastId });
-      }
-
-    } catch (error: any) {
-      toast.error(`❌ Failed: ${actionLabel}`, { id: toastId });
-    } finally {
-      setLoading(null);
+      setIsModalOpen(true);
+      toast.success("System scan completed.", { id: toastId, duration: 3000 });
+    } else {
+      toast.success(data.message || `${actionLabel} completed.`, { id: toastId });
     }
-  };
+  } catch (error: any) {
+    toast.error(`❌ Failed: ${actionLabel}`, { id: toastId });
+  } finally {
+    setLoading(null);
+  }
+};
+
 
   const actions = [
     {
@@ -97,25 +103,46 @@ export function QuickActions() {
         ))}
       </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>🛡️ System Scan Results</DialogTitle>
-          </DialogHeader>
+   
 
-          {scanResult && (
-            <div className="space-y-2">
-              <p><strong>Message:</strong> {scanResult.message}</p>
-              <p><strong>Threats Found:</strong> {scanResult.threatsFound}</p>
-              <p><strong>Last Scan:</strong> {scanResult.lastScanTime}</p>
-            </div>
-          )}
+<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+  <DialogContent className="max-w-md">
+    <DialogHeader>
+      <DialogTitle className="text-xl flex items-center gap-2">
+        🛡️ System Scan Summary
+      </DialogTitle>
+    </DialogHeader>
 
-          <DialogFooter>
-            <Button onClick={() => setIsModalOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+    {scanResult && (
+      <div className="space-y-3 text-sm text-muted-foreground">
+        <div>
+          <span className="font-medium text-foreground">Message:</span>{" "}
+          {scanResult.message}
+        </div>
+        <div>
+          <span className="font-medium text-foreground">Status:</span>{" "}
+          {scanResult.status || "Success"}
+        </div>
+        <div>
+          <span className="font-medium text-foreground">Threats Found:</span>{" "}
+          {scanResult.threatsFound}
+        </div>
+        <div>
+          <span className="font-medium text-foreground">Last Scan:</span>{" "}
+          {scanResult.lastScanTime.toLocaleString()}
+ 
+        </div>
+      </div>
+    )}
+
+    <DialogFooter>
+      <Button onClick={() => setIsModalOpen(false)} className="mt-2">
+        Close
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </>
   );
 }
