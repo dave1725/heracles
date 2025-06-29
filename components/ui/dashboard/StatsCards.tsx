@@ -17,6 +17,7 @@ import {
   Settings,
   Activity,
   ShieldCheck,
+  ThermometerSun,
 } from "lucide-react";
 
 import axios from "axios";
@@ -39,17 +40,19 @@ export function StatsCards() {
   const [ maxSpeed, setMaxSpeed ] = useState<any>();
   const [ virtualization, setVirtualization ] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [ thermalData, setThermalData ] = useState<any>();
 
   // Function to fetch stats
   const fetchStats = async () => {
     setIsLoading(true);
 
     try {
-      const [cpuRes, memoryRes, diskRes, uptimeRes] = await Promise.all([
+      const [cpuRes, memoryRes, diskRes, uptimeRes, thermalRes] = await Promise.all([
         axios.get("http://localhost:3000/api/stats/system/cpu"),
         axios.get("http://localhost:3000/api/stats/system/memory"),
         axios.get("http://localhost:3000/api/stats/system/disk"),
         axios.get("http://localhost:3000/api/stats/system/uptime"),
+        axios.get("http://localhost:3000/api/stats/system/thermal")
       ]);
 
       setCpuInfo(cpuRes.data.cpuLoadPercentage);
@@ -60,7 +63,8 @@ export function StatsCards() {
       setMaxSpeed(cpuRes.data.maxSpeedMHz);
       setVirtualization(cpuRes.data.virtualizationEnabled);
       setMemoryInfo(memoryRes.data.MemoryUsagePercentage);
-
+      console.log(thermalRes);
+      setThermalData(thermalRes.data);
 
       const diskData = diskRes.data;
       setDiskInfo(diskData);
@@ -159,6 +163,13 @@ export function StatsCards() {
       icon: <Timer className="w-5 h-5 text-primary" />,
       warning: uptimeHrs >= 12,
       warningMessage: "Please restart soon",
+    },
+    {
+      label: "Temperature",
+      value: `${thermalData.TemperatureCelsius} C`,
+      icon: <ThermometerSun className="w-5 h-5 text-primary" />,
+      warning: thermalData >= 80,
+      warningMessage: "Please shutdown your system",
     },
   ];
 

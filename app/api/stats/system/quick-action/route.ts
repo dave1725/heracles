@@ -10,11 +10,16 @@ export async function POST(req: Request) {
     const { action } = await req.json();
     const scriptPath = path.resolve(process.cwd(), `scripts/${action}.ps1`);
 
-    const { stdout } = await execFileAsync("powershell", [
+    const { stdout, stderr } = await execFileAsync("powershell", [
       "-NoProfile",
       "-ExecutionPolicy", "Bypass",
       "-File", scriptPath
     ]);
+    console.log(stdout);
+    if(stderr) return NextResponse.json(
+      {message: stderr},
+      {status:500}
+    )
 
     const json = JSON.parse(stdout);
     return NextResponse.json(json);

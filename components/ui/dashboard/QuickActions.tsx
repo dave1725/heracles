@@ -71,7 +71,6 @@ export function QuickActions() {
     }
   };
 
-
   const actions = [
     {
       label: "Clean Temp Files",
@@ -92,6 +91,11 @@ export function QuickActions() {
       label: "Restart Explorer",
       icon: <RocketIcon className="w-4 h-4 mr-2" />,
       script: "restartExplorer",
+    },
+    {
+      label: "Empty Recycle Bin",
+      icon: <Trash2 className="w-4 h-4 mr-2" />,
+      script: "emptyRecycleBin",
     },
   ];
 
