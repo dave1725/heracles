@@ -1,7 +1,7 @@
 import { StatsCards } from "@/components/ui/dashboard/StatsCards";
 import { QuickActions } from "@/components/ui/dashboard/QuickActions";
 import { SystemStatus } from "@/components/ui/dashboard/SystemStatus";
-import Navbar from "./navbar/page";
+import Navbar from "../navbar/page";
 import { SystemInfo } from "@/components/ui/dashboard/SystemInfo";
 import { DisksOverview } from "@/components/ui/dashboard/DiskOverview";
 import { StartupPrograms } from "@/components/ui/dashboard/StartupPrograms";
@@ -25,6 +25,9 @@ export default function DashboardPage() {
       <SystemInfo />
       <DisksOverview />
       {/* <SystemStatus /> */}
+      <StartupPrograms />
+      <WindowsUpdates />
+      <SecurityCenter />
       <RecentLogs />
       <ServicesStatus />
       <NetworkInfo />
