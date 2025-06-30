@@ -23,36 +23,36 @@ type NetworkAdapter = {
   ssid?: string; // for wifi
 };
 
-const mockAdapters: NetworkAdapter[] = [
-  {
-    id: "1",
-    name: "Ethernet 1",
-    status: "connected",
-    ipv4: "192.168.1.100",
-    ipv6: "fe80::1234:abcd:5678:9abc",
-    dns: ["8.8.8.8", "8.8.4.4"],
-    speedMbps: 1000,
-    type: "ethernet",
-  },
-  {
-    id: "2",
-    name: "Wi-Fi",
-    status: "connected",
-    ipv4: "192.168.1.101",
-    dns: ["1.1.1.1", "1.0.0.1"],
-    speedMbps: 300,
-    type: "wifi",
-    ssid: "Home_Network",
-  },
-  {
-    id: "3",
-    name: "Ethernet 2",
-    status: "disconnected",
-    ipv4: "",
-    dns: [],
-    type: "ethernet",
-  },
-];
+// const mockAdapters: NetworkAdapter[] = [
+//   {
+//     id: "1",
+//     name: "Ethernet 1",
+//     status: "connected",
+//     ipv4: "192.168.1.100",
+//     ipv6: "fe80::1234:abcd:5678:9abc",
+//     dns: ["8.8.8.8", "8.8.4.4"],
+//     speedMbps: 1000,
+//     type: "ethernet",
+//   },
+//   {
+//     id: "2",
+//     name: "Wi-Fi",
+//     status: "connected",
+//     ipv4: "192.168.1.101",
+//     dns: ["1.1.1.1", "1.0.0.1"],
+//     speedMbps: 300,
+//     type: "wifi",
+//     ssid: "Home_Network",
+//   },
+//   {
+//     id: "3",
+//     name: "Ethernet 2",
+//     status: "disconnected",
+//     ipv4: "",
+//     dns: [],
+//     type: "ethernet",
+//   },
+// ];
 
 function getStatusIcon(status: NetworkAdapter["status"]) {
   if (status === "connected") {
@@ -80,7 +80,7 @@ export function NetworkInfo() {
 
     fetchNetworkInfo();
   }, []);
-  
+
 
   if (
     !adapters
@@ -120,8 +120,10 @@ export function NetworkInfo() {
                       </p>
                     )}
                     <p>
-                      <span className="font-medium">DNS:</span> {dns.join(", ")}
+                      <span className="font-medium">DNS:</span>{" "}
+                      {Array.isArray(dns) ? dns.join(", ") : dns || "N/A"}
                     </p>
+
                     {speedMbps && (
                       <p>
                         <span className="font-medium">Speed:</span> {speedMbps} Mbps
