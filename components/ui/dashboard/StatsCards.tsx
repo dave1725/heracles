@@ -144,7 +144,7 @@ export function StatsCards() {
     },
     {
       label: "Temperature",
-      value: `${thermalData.TemperatureCelsius} C`,
+      value: `${thermalData.TemperatureCelsius ?? "N/A"} C`,
       icon: <ThermometerSun className="w-5 h-5 text-primary" />,
       warning: thermalData.TemperatureCelsius >= 80,
       warningMessage: "Please shutdown your system",
