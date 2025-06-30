@@ -1,0 +1,12 @@
+# Global owner
+* @dave1725
+
+# Ownership for key folders
+scripts/            @dave1725
+app/                @dave1725
+components/         @dave1725
+lib/                @dave1725
+public/             @dave1725
+
+# GitHub configuration and workflows
+.github/            @dave1725
