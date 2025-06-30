@@ -1,5 +1,8 @@
 # Heracles – Level Up Your Maintenance
 
+[![Version](https://img.shields.io/badge/version-v1.0.0--beta-yellow)](#)
+[![Status](https://img.shields.io/badge/status-beta-orange)](#)
+
 Heracles is a modern, Windows-native system maintenance toolkit built for power users and IT professionals.  
 It delivers diagnostics, optimization, and security management through a real-time Next.js interface, backed by tightly integrated PowerShell automation.
 
@@ -17,6 +20,8 @@ It delivers diagnostics, optimization, and security management through a real-ti
 [![GitHub Stars](https://img.shields.io/github/stars/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/network/members)
 [![GitHub Watchers](https://img.shields.io/github/watchers/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/watchers)
+
+
 
 > **Note:** Heracles is currently in **public beta**. All core features are stable, but enhancements and refinements are actively ongoing.  
 > Contributions, bug reports, and feature suggestions are highly appreciated.
