@@ -3,6 +3,8 @@
 Heracles is a modern, Windows-native system maintenance toolkit built for power users and IT professionals.  
 It delivers diagnostics, optimization, and security management through a real-time Next.js interface, backed by tightly integrated PowerShell automation.
 
+![Heracles Screenshot](./public/cover.png)
+
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://shields.io/)
 [![Version](https://img.shields.io/badge/version-v1.0.0--beta-yellow)](#)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
