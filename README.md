@@ -1,8 +1,7 @@
-# Heracles - Level Up Your Maintenance
+# Heracles – Level Up Your Maintenance
 
-Heracles is a modern, Windows-native system maintenance toolkit that provides diagnostics, optimization, and security management for power users and IT professionals.
-
-It combines a responsive, Next.js-powered frontend with real-time system insights and actionable PowerShell automation — including startup control, performance monitoring, quick scans, Windows updates, security signals, and more.
+Heracles is a modern, Windows-native system maintenance toolkit built for power users and IT professionals.  
+It delivers diagnostics, optimization, and security management through a real-time Next.js interface, backed by tightly integrated PowerShell automation.
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://shields.io/)
 [![Version](https://img.shields.io/badge/version-v1.0.0--beta-yellow)](#)
@@ -17,36 +16,46 @@ It combines a responsive, Next.js-powered frontend with real-time system insight
 [![GitHub Forks](https://img.shields.io/github/forks/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/network/members)
 [![GitHub Watchers](https://img.shields.io/github/watchers/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/watchers)
 
+> **Note:** Heracles is currently in **public beta**. All core features are stable, but enhancements and refinements are actively ongoing.  
+> Contributions, bug reports, and feature suggestions are highly appreciated.
 
-> **Note:** Heracles is currently in `public beta`. The application is fully functional, but certain features are still under active development. Contributions and feedback are welcome.
 
 ## Features
 
-Heracles provides a unified control panel for Windows optimization with native-level performance, full transparency, and secure scripting. Key features include:
+Heracles provides a comprehensive suite of tools for monitoring, diagnosing, and optimizing Windows systems.
 
-### 🔧 System Maintenance Tools
-- **Quick Actions**: One-click controls for temp cleanup, DNS flush, recycle bin emptying, and more.
-- **Startup Manager**: View, enable, or disable startup items sourced from Registry and Startup folders.
-- **Recycle Bin Management**: Force clear the Recycle Bin without prompts.
+### 🖥️ System Monitoring
+- Real-time CPU, memory, disk, and battery statistics
+- CPU load, thread count, virtualization status, speed monitoring
+- Thermal data (temperature sensors, if supported)
+- Uptime tracking with reboot suggestions
 
-### 📊 Performance Monitoring
-- **Live System Stats**: Track CPU load, RAM usage, disk consumption, and uptime.
-- **Battery Diagnostics**: Displays charging state, battery wear, estimated runtime, and chemistry.
-- **Thermal Status**: Reads live temperature values from TZ(if supported).
-- **Power State Configuration**: Adjust AC/DC processor throttle limits with persistent saving.
+### 🚀 Performance Optimization
+- Clean temporary files (AppData, Temp, %SystemTemp%)
+- Flush DNS cache
+- Restart Windows Explorer instantly
+- Adjust processor power states (AC/DC performance configuration)
+- Empty Recycle Bin via automation
 
-### 🔒 Security Center
-- **Signal Checks**: Get live status of core features like UAC, Secure Boot, SmartScreen, Firewall, Defender, RDP, and more.
-- **Windows Updates**: Check update status and pending reboots directly from the interface.
-- **Scan Summary Modal**: Integrated scan result modals with last run time and threat count.
+### 🔐 Security & Stability
+- Quick Windows Defender scan integration
+- Display recent scan results and threat count
+- System security signal overview (UAC, RDP, Secure Boot, etc.)
 
-### 💡 Design & Tech Stack
-- **Framework**: Next.js 13+ App Router with API Routes
-- **UI Library**: Tailwind CSS + ShadCN UI
-- **Backend Scripting**: PowerShell for system-level interaction
-- **Notification System**: Sonner-based toast UI for interactive feedback
+### ⚙️ System Control
+- Startup program manager (enable/disable entries from registry & folders)
+- Windows Update status checker
+- Battery health and runtime insights (for portable devices)
 
-> All actions run locally and securely with no external dependencies. Heracles is privacy-respecting and offline-friendly.
+### 📡 Backend Integration
+- PowerShell automation for all critical actions
+- Next.js API routes with Promisified PowerShell execution
+- Polling & scheduling support for key metrics
+
+### 💡 Developer Friendly
+- Built using Next.js App Router, Tailwind CSS, and ShadCN UI
+- Modular and extensible architecture
+- Clean, documented codebase with separation of concerns
 
 ## Getting Started
 
@@ -60,12 +69,62 @@ To run Heracles on your Windows system, you’ll need to install dependencies an
 - [PowerShell 5.1+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
 - Git (optional, for cloning the repository)
 
----
 
 ### Installation
 
-```bash
-git clone https://github.com/dave1725/heracles.git
-cd heracles
-npm install
+Follow these steps to install and run Heracles on your Windows machine:
+
+---
+- Please clone the repo
+
+    ```bash
+    git clone https://github.com/dave1725/heracles.git
+    ```
+
+- Get into the repo
+
+    ```bash
+    cd heracles
+    ```
+
+- Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+- Run terminal as Administrator
+
+    Heracles requires elevated privileges to execute PowerShell scripts and interact with system-level resources
+    > Make sure to open your terminal (CMD or PowerShell) as Administrator for proper execution.
+
+
+- Next, please build the application
+
+    ```bash
+    npm run build
+    ```
+
+- Next, start your production server
+    ```bash
+    npm start   
+    ```
+The application will now be accessible at: `http://localhost:3000`
+
+## Author(s)
+
+This project is developed and maintained by:
+
+- **Dave** – [@dave1725](https://github.com/dave1725)  
+  _Lead Developer, PowerShell Integration, UI/UX Design, System Architecture_
+
+---
+
+If you’d like to contribute to the project, please check the [Contributing Guide](CONTRIBUTING.md) and open a pull request or issue.
+
+
+# License
+This project is open-source and licensed under [GNU](https://choosealicense.com/licenses/gpl-3.0/). Feel free to contribute and be part of the digital evolution.
+
+
 
