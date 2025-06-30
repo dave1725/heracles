@@ -3,6 +3,7 @@
 Heracles is a modern, Windows-native system maintenance toolkit that provides diagnostics, optimization, and security management for power users and IT professionals.
 
 It combines a responsive, Next.js-powered frontend with real-time system insights and actionable PowerShell automation — including startup control, performance monitoring, quick scans, Windows updates, security signals, and more.
+
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://shields.io/)
 [![Version](https://img.shields.io/badge/version-v1.0.0--beta-yellow)](#)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -11,12 +12,13 @@ It combines a responsive, Next.js-powered frontend with real-time system insight
 [![PowerShell](https://img.shields.io/badge/PowerShell-%3E=5.1-lightgrey)](https://docs.microsoft.com/en-us/powershell/)
 [![Next.js](https://img.shields.io/badge/Next.js-%5E15.1.0-black)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-%5E3.0.0-38bdf8)](https://tailwindcss.com/)
-[![GitHub Stars](https://img.shields.io/github/stars/your-org/heracles?style=social)](https://github.com/dave1725/heracles/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/your-org/heracles?style=social)](https://github.com/dave1725/heracles/network/members)
-[![GitHub Watchers](https://img.shields.io/github/watchers/your-org/heracles?style=social)](https://github.com/dave1725/heracles/watchers)
+
+[![GitHub Stars](https://img.shields.io/github/stars/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/network/members)
+[![GitHub Watchers](https://img.shields.io/github/watchers/dave1725/heracles?style=social)](https://github.com/dave1725/heracles/watchers)
 
 
-> **Note:** Heracles is currently in **public beta**. The application is fully functional, but certain features are still under active development. Contributions and feedback are welcome.
+> **Note:** Heracles is currently in `public beta`. The application is fully functional, but certain features are still under active development. Contributions and feedback are welcome.
 
 ## Features
 
